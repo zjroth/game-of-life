@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <title>Connect Four</title>
+    <style>
+      tr, td {
+        border: 0px;
+      }
+
+      table {
+        border-collapse: collapse;
+        border: 1px solid black;
+      }
+
+      td {
+        height: 5px;
+        width: 5px;
+        text-align: center;
+      }
+    </style>
+    <script type="text/javascript" src="game-of-life.js"></script>
+  </head>
+  <body onload="iterateGame(initGame(30, 30), 100);">
+    <h2>The Game of Life</h2>
+    <div id="divBoard"></div>
+  </body>
+</html>
