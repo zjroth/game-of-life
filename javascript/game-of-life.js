@@ -17,13 +17,13 @@ function initGame(iWidth, iHeight) {
 }
 
 function countNeighbors(arrGame, iRow, iCol) {
-    var tmp = [-1, 0, 1];
+    var offsets = [-1, 0, 1];
     var iNeighbors = 0;
     var iRows = arrGame.length;
     var iCols = arrGame[0].length;
 
-    tmp.forEach(function (rowOffset) {
-        tmp.forEach(function (colOffset) {
+    offsets.forEach(function (rowOffset) {
+        offsets.forEach(function (colOffset) {
             var row = iRow + rowOffset;
             var col = iCol + colOffset;
 
