@@ -1,0 +1,23 @@
+* Game of Life
+
+The concept is simple: If you have just enough people around, life will go on.
+If you're too crowded, you'll die. If you're too alone, you'll die. If the right
+number of people surround an empty area, life will extend to that area. Simple
+though the rules are, the results can be quite stunning.
+
+The precise rules for the game are stated here, as taken from [[https://en.wikipedia.org/wiki/Conway's_Game_of_Life][Wikipedia]]:
+1. Any live cell with fewer than two live neighbours dies, as if caused by
+   under-population.
+2. Any live cell with two or three live neighbours lives on to the next
+   generation.
+3. Any live cell with more than three live neighbours dies, as if by
+   over-population.
+4. Any dead cell with exactly three live neighbours becomes a live cell, as if
+   by reproduction.
+
+* This repository
+
+I created this repository to house implementations of Conway's Game of Life in
+various languages. Why? This game serves as my hello-world program for new
+languages that I'm exploring. The rules of the game are simple, and the results
+are fun to watch.
