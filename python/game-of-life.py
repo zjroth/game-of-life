@@ -12,8 +12,53 @@
 # - Any live cell with more than three live neighbors dies, as if by overpopulation.
 # - Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
 
-# We'll need some randomness.
+# We'll need some randomness later.
 import random
+
+class Array2D:
+    def __init__(self, num_rows, num_cols, eltype):
+        """Create a two-dimensional array.  The parameter `eltype` specifies the data
+        type of the elements of the array (e.g., `int`, `bool`, `float`)."""
+        array = [[eltype(0) for j in range(num_cols)]
+                 for i in range(num_rows)]
+
+        # Store the array and its dimensions in the object.
+        self.data = array
+        self.eltype = eltype
+        self.dims = (num_rows, num_cols)
+
+    def validindex(self, key):
+        """Determine whether the given index is valid."""
+        # We need to make sure that exactly two indices have been provided.
+        correct_len = (len(key) == 2)
+        row_valid = (0 <= key[0] < self.dims[0])
+        col_valid = (0 <= key[1] < self.dims[1])
+
+        return correct_len and row_valid and col_valid
+
+    def __getitem__(self, key):
+        """Get the element at the specified index."""
+        # Make sure that the index is valid.
+        assert self.validindex(key), "Invalid index into `Array2D`."
+
+        # Return the requested element.
+        return self.data[key[0]][key[1]]
+
+    def __setitem__(self, key, value):
+        """Set the element at the specified index to the specified value."""
+        # Make sure that the index is valid.
+        assert self.validindex(key), "Invalid index into `Array2D`."
+
+        # Make sure that the value is of the correct type.
+        assert self.eltype == type(value), \
+            "Provided element of type `{0}` instead of type `{1}`.".format(
+                type(value), self.eltype)
+
+        # Set the element to the given value.
+        self.data[key[0]][key[1]] = value
+
+    def sum(self):
+        return sum(sum(r) for r in self.data)
 
 class GameOfLife:
     """A board/world on which Conway's Game of Life will be played/lived.  Each such
@@ -27,22 +72,16 @@ class GameOfLife:
     def __init__(self, num_rows, num_cols, on_torus = False):
         """Create a new board on which to play the Game of Life."""
         # Create the board.
-        board = GameOfLife.create_empty_board(num_rows, num_cols)
+        board = Array2D(num_rows, num_cols, eltype = bool)
 
         # Store the board and its dimensions in the object.
         # TODO: It'd be bad if someone modified these.  Can they be made private?
-        self.rows = num_rows
-        self.cols = num_cols
         self.board = board
+        self.cols = num_cols
+        self.rows = num_rows
 
         # Store some variables related to indexing.
         self.on_torus = True if on_torus else False
-
-    @staticmethod
-    def create_empty_board(num_rows, num_cols):
-        """Create an empty board for the Game of Life."""
-        return [[False for j in range(num_cols)]
-                 for i in range(num_rows)]
 
     def randomize_board(self, prob_alive = 0.25):
         """Set the board to a random state with each entry having `prob_alive` chance of
@@ -52,8 +91,9 @@ class GameOfLife:
             "The parameter `prob_alive` must be strictly between zero and one."
 
         # Set each entry randomly.
-        self.board = [[random.random() < prob_alive for j in range(num_cols)]
-                      for i in range(num_rows)]
+        for i in range(num_rows):
+            for j in range(num_cols):
+                self.board[i, j] = (random.random() < prob_alive)
 
     def row_inbounds(self, row):
         """Determine whether the given row is valid."""
@@ -82,7 +122,7 @@ class GameOfLife:
             assert self.col_inbounds(col), "Column index out of bounds"
 
         # Return the requested item.
-        return self.board[row][col]
+        return self.board[row, col]
 
     def count_neighbors(self, row, col):
         """Count how many neighbors a given cell has."""
@@ -122,10 +162,7 @@ class GameOfLife:
         """Update the current board state."""
 
         # Create an empty board.  We'll fill it, then replace the current board.
-        #
-        # NOTE: Maybe I should create a new `GameOfLife` object here.  There
-        # would be some overhead, bu tit might be more convenient.
-        board_new = GameOfLife.create_empty_board(self.rows, self.cols)
+        board_new = Array2D(self.rows, self.cols, eltype = bool)
 
         # Update each board element one at a time...
         for row in range(self.rows):
@@ -138,15 +175,16 @@ class GameOfLife:
                 # need to specify where life occurs (or, rather, might occur) in
                 # the new board.
                 if self[row, col]:
-                    board_new[row][col] = (2 <= num_neighbors <= 3)
+                    board_new[row, col] = (2 <= num_neighbors <= 3)
                 else:
-                    board_new[row][col] = (num_neighbors == 3)
+                    board_new[row, col] = (num_neighbors == 3)
 
         # Update the board.
         self.board = board_new
 
     def has_life(self):
-        num_alive = sum(map(sum, self.board))
+        """Determine whether any cells are alive on the current board."""
+        num_alive = self.board.sum()
         return num_alive > 0
 
 # ========================================================================
@@ -178,16 +216,33 @@ def parse_positive_int(string):
 
     return is_positive_int, num
 
+def parse_yes_no(string, default = 'n'):
+    """Parse 'yes'/'y' and 'no'/'n' as bools (True and False, respectively)."""
+    if string == '':
+        string = default
+
+    if string == 'yes' or string == 'y':
+        return (True, True)
+    elif string == 'n' or string == 'n':
+        return (True, False)
+    else:
+        return (False, None)
+
 # Get a board size from the user.
 default_size = 30
-str_prompt = "Specify a number of {0} for the board (default {0}): ".format(default_size)
+str_prompt = "Specify a number of {0} for the board (default " \
+             + str(default_size) +  "): "
 fcn_parse = lambda string: (True, default_size) if string == '' else parse_positive_int(string)
 
 num_rows = my_prompt(str_prompt.format('rows'), fcn_parse)
 num_cols = my_prompt(str_prompt.format('columns'), fcn_parse)
 
+# Should we play on a torus?
+fcn_parse_torus = lambda string: (True, False) if string == '' else parse_yes_no(string)
+on_torus = my_prompt("Make the board a torus (a la Pac-Man)? y/[n]: ", parse_yes_no)
+
 # Initialize a random game.
-game = GameOfLife(num_rows, num_cols, on_torus = True)
+game = GameOfLife(num_rows, num_cols, on_torus = on_torus)
 game.randomize_board()
 
 # ========================================================================
