@@ -104,8 +104,8 @@ class GameOfLife:
             "The parameter `prob_alive` must be strictly between zero and one."
 
         # Set each entry randomly.
-        for i in range(num_rows):
-            for j in range(num_cols):
+        for i in range(self.rows):
+            for j in range(self.cols):
                 self.board[i, j] = (random.random() < prob_alive)
 
     def row_inbounds(self, row):
