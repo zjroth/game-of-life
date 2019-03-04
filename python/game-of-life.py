@@ -1,19 +1,18 @@
-
 # ========================================================================
-# Conway's Game of Life
+# Imports
 # ========================================================================
-
-# A python implementation of Conway's Game of Life.  See
-# https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life for more information.
 #
-# Here are the basic rules:
-# - Any live cell with fewer than two live neighbors dies, as if by underpopulation.
-# - Any live cell with two or three live neighbors lives on to the next generation.
-# - Any live cell with more than three live neighbors dies, as if by overpopulation.
-# - Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
+# These imports are really only here for the GUI.
 
-# We'll need some randomness later.
-import random
+import random                   # for randomizing the board
+import tkinter as tk            # the GUI toolkit
+
+# ========================================================================
+# A two-dimensional array class
+# ========================================================================
+#
+# A simple array class just for the heck of it.  We could obviously just use nested
+# lists or numpy arrays.
 
 class Array2D:
     def __init__(self, num_rows, num_cols, eltype):
@@ -58,8 +57,23 @@ class Array2D:
         self.data[key[0]][key[1]] = value
 
     def sum(self):
+        """Sum up all of the entries in the array."""
         return sum(sum(r) for r in self.data)
 
+# ========================================================================
+# Conway's Game of Life
+# ========================================================================
+#
+# A python implementation of Conway's Game of Life.  See
+# https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life for more information.
+#
+# Here are the basic rules:
+# - Any live cell with fewer than two live neighbors dies, as if by underpopulation.
+# - Any live cell with two or three live neighbors lives on to the next generation.
+# - Any live cell with more than three live neighbors dies, as if by overpopulation.
+# - Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
+
+# The main code for Conway's Game of Life.
 class GameOfLife:
     """A board/world on which Conway's Game of Life will be played/lived.  Each such
     board should contain the following variables:
@@ -188,9 +202,13 @@ class GameOfLife:
         return num_alive > 0
 
 # ========================================================================
-# Code to prompt the user for a board size
+# Prompt the user for board characteristics.
 # ========================================================================
+#
+# Before creating the GUI below, as the user for a board size and whether the
+# board/world should be a torus.
 
+# Function to prompt until we get an answer we like.
 def my_prompt(msg, fcn_parse):
     """Prompt a user for input.  Proceed with the prompt until the provided function
     returns true for the given input.  Function should return a tuple
@@ -204,6 +222,7 @@ def my_prompt(msg, fcn_parse):
 
     return value
 
+# Function to determine whether a string represents a positive integer.
 def parse_positive_int(string):
     """Try to parse a string as a positive.  Return tuple `(True, num)` if `string`
     represents a positive integer `num`.  Return `(False, None)` otherwise."""
@@ -216,6 +235,7 @@ def parse_positive_int(string):
 
     return is_positive_int, num
 
+# Function to determine whether a string represents a yes/no response.
 def parse_yes_no(string, default = 'n'):
     """Parse 'yes'/'y' and 'no'/'n' as bools (True and False, respectively)."""
     if string == '':
@@ -246,11 +266,11 @@ game = GameOfLife(num_rows, num_cols, on_torus = on_torus)
 game.randomize_board()
 
 # ========================================================================
-# A simple tkinter interface
+# A simple GUI demo
 # ========================================================================
-
-# Load the toolkit for drawing.
-import tkinter as tk
+#
+# Draw the board we created above, and update it every 250 milliseconds as long
+# as there is life on the board.  No additional interaction is supported.
 
 # Create a canvas for drawing to.
 master = tk.Tk()
