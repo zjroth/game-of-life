@@ -259,8 +259,7 @@ w = tk.Canvas(master, width = 10 * num_cols, height = 10 * num_rows)
 w.pack()
 
 # Create the rectangles with which we'll draw the game.
-import numpy as np
-rects = np.zeros((game.rows, game.cols), dtype = int)
+rects = Array2D(game.rows, game.cols, eltype = int)
 
 for i in range(game.rows):
     for j in range(game.cols):
