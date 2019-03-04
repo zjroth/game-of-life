@@ -6,7 +6,7 @@
 import tkinter as tk
 
 # Conway's Game of Life (our code)
-exec(open("game_of_life.py").read())
+from game_of_life import Array2D, GameOfLife
 
 # ========================================================================
 # Prompt the user for board characteristics.
